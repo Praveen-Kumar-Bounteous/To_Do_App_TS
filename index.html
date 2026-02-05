@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Taskify | Never Miss a Deadline</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 min-h-screen">
+
+<header class="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-4 flex justify-between items-center shadow">
+  <h1 class="text-xl font-bold tracking-wide">Taskify</h1>
+  <button id="addTaskBtn" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium">
+    + Add Task
+  </button>
+</header>
+
+<div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-sm text-gray-500">Total Tasks</p>
+    <h2 id="dash-total" class="text-2xl font-bold">0</h2>
+  </div>
+  <div class="bg-blue-50 p-4 rounded-xl shadow">
+    <p class="text-sm text-blue-600">To Do</p>
+    <h2 id="dash-todo" class="text-2xl font-bold text-blue-700">0</h2>
+  </div>
+  <div class="bg-yellow-50 p-4 rounded-xl shadow">
+    <p class="text-sm text-yellow-600">In Progress</p>
+    <h2 id="dash-inprogress" class="text-2xl font-bold text-yellow-700">0</h2>
+  </div>
+  <div class="bg-green-50 p-4 rounded-xl shadow">
+    <p class="text-sm text-green-600">Done</p>
+    <h2 id="dash-done" class="text-2xl font-bold text-green-700">0</h2>
+  </div>
+  <div class="bg-red-50 p-4 rounded-xl shadow">
+    <p class="text-sm text-red-600">Pending</p>
+    <h2 id="dash-pending" class="text-2xl font-bold text-red-700">0</h2>
+  </div>
+</div>
+
+<div class="bg-white shadow-sm">
+  <div class="flex gap-3 p-3 overflow-x-auto">
+    <button class="tab-btn px-4 py-2 rounded-lg bg-blue-50" data-status="todo">
+      To Do <span id="count-todo">(0)</span>
+    </button>
+    <button class="tab-btn px-4 py-2 rounded-lg bg-yellow-50" data-status="inprogress">
+      In Progress <span id="count-inprogress">(0)</span>
+    </button>
+    <button class="tab-btn px-4 py-2 rounded-lg bg-green-50" data-status="done">
+      Done <span id="count-done">(0)</span>
+    </button>
+    <button class="tab-btn px-4 py-2 rounded-lg bg-red-50" data-status="pending">
+      Pending <span id="count-pending">(0)</span>
+    </button>
+  </div>
+</div>
+
+<div class="p-4">
+  <div class="bg-white rounded-xl shadow overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-100">
+        <tr>
+          <th class="px-4 py-3 text-left">Title</th>
+          <th class="px-4 py-3 text-left">Progress</th>
+          <th class="px-4 py-3 text-left">Deadline</th>
+          <th class="px-4 py-3 text-left">Action</th>
+        </tr>
+      </thead>
+      <tbody id="taskContainer" class="divide-y"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="reminderPopup"
+     class="hidden fixed top-6 left-1/2 -translate-x-1/2 bg-white text-black rounded-xl shadow-lg z-50 transform transition-all duration-500 opacity-0 scale-95">
+</div>
+
+<div id="taskModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
+    <h2 class="font-bold text-lg mb-4">Add Task</h2>
+
+    <input id="title" placeholder="Title" class="border rounded-lg w-full mb-3 p-2" />
+    <textarea id="description" placeholder="Description" class="border rounded-lg w-full mb-3 p-2"></textarea>
+
+    <select id="tag" class="border rounded-lg w-full mb-3 p-2">
+      <option value="important">Important</option>
+      <option value="neutral">Neutral</option>
+      <option value="general">General</option>
+    </select>
+
+    <input id="deadline" type="datetime-local" class="border rounded-lg w-full mb-4 p-2" />
+
+    <div class="flex justify-end gap-3">
+      <button id="closeModal" class="px-4 py-2 rounded-lg hover:bg-gray-100">Cancel</button>
+      <button id="saveTask" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="editModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
+    <h2 class="font-bold text-lg mb-4">Edit Task</h2>
+
+    <input id="editTitle" class="border rounded-lg w-full mb-3 p-2" />
+    <textarea id="editDesc" class="border rounded-lg w-full mb-3 p-2"></textarea>
+
+    <select id="editStatus" class="border rounded-lg w-full mb-3 p-2">
+      <option value="todo">To Do</option>
+      <option value="inprogress">In Progress</option>
+      <option value="done">Done</option>
+      <option value="pending">Pending</option>
+    </select>
+
+    <select id="extendTime" class="border rounded-lg w-full mb-4 p-2">
+      <option value="">Extend Time</option>
+      <option value="10">10 mins</option>
+      <option value="15">15 mins</option>
+      <option value="30">30 mins</option>
+      <option value="45">45 mins</option>
+      <option value="60">60 mins</option>
+    </select>
+
+    <div class="flex justify-between">
+        <button id="deleteTaskBtn" class="text-red-600 hover:underline">Delete</button>
+        <div class="flex gap-3">
+          <button id="cancelEditBtn">Cancel</button>
+          <button id="updateTaskBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Update</button>
+        </div>
+      </div>
+  </div>
+</div>
+
+<script src="dist/app.js" defer></script>
+<script src="dist/data.js"></script>
+<script src="dist/logic.js"></script>
+<script src="dist/ui.js"></script>
+</body>
+</html>
